@@ -1020,6 +1020,11 @@ class AmazonS3StreamWrapper implements DrupalStreamWrapperInterface {
             $this->s3->set_hostname($this->hostname);
             $this->s3->allow_hostname_override(FALSE);
           }
+          # Fixes problem with bucket names containing more than one dot
+          # https://forums.aws.amazon.com/thread.jspa?start=0&threadID=69108&tstart=0#308166
+          if (substr_count($this->bucket, ".") > 1) {
+            $this->s3->path_style = true;
+          }
         }
         catch (Exception $e) {
           drupal_set_message(t('There was a problem using S3. @message', array('message' => $e->getMessage())), 'error');
